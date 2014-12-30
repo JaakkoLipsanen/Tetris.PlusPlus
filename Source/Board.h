@@ -1,10 +1,12 @@
 #pragma once
 #include <Block.h>
+#include <BlockGenerator.h>
+#include <memory>
 
 class Board
 {
-	explicit Board()
-		: _currentBlock(Block(BlockType::I))
+	explicit Board( std::unique_ptr<IBlockGenerator> generator)
+		: _generator(std::move(generator)),  _currentBlock(Block(_generator->Next()))
 	{
 	}
 
@@ -17,5 +19,6 @@ public:
 
 private:
 	BlockType _blocks[Board::Width * Board::Height];
+	std::unique_ptr<IBlockGenerator> _generator;
 	Block _currentBlock;
 };

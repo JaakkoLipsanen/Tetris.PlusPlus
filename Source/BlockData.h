@@ -11,8 +11,8 @@ public:
 	const int Width;
 	const int Height;
 
-	explicit BlockData(int width, int height, bool** data)
-		: Width(width), Height(height), _data(data, data + width * height)
+	explicit BlockData(int width, int height, std::vector<bool> data)
+		: Width(width), Height(height), _data(data)
 	{
 	}
 

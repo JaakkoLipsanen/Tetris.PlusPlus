@@ -1,5 +1,7 @@
 #include <Board.h>
+
 #include <Diagnostics/Ensure.h>
+#include <Math/Rectangle.h>
 
 BlockType Board::At(int x, int y) const
 {
@@ -12,5 +14,11 @@ BlockType Board::At(int x, int y) const
 		return blockType;
 	}
 
-	return _currentBlock.
+	Vector2i blockSpacePosition = Vector2i(x, y) - _currentBlock.GetTopLeftPosition();
+	if (_currentBlock.GetBoundingArea().Contains(blockSpacePosition))
+	{
+		return _currentBlock.GetData().At(blockSpacePosition.X, blockSpacePosition.Y) ? _currentBlock.Type : BlockType::Empty;
+	}
+
+	return BlockType::Empty;
 }

@@ -36,7 +36,9 @@ void Block::MoveDown()
 
 bool Block::MoveHorizontally(HorizontalDirection direction)
 {
+	// todo: check if move is possible
 	_topLeftPosition.X += static_cast<int>(direction);
+	return true;
 }
 
 void Block::Rotate()

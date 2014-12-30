@@ -2,6 +2,8 @@
 #include <Block.h>
 
 #include <Diagnostics/Ensure.h>
+#include <array>
+#include <vector>
 
 bool BlockData::At(int x, int y) const
 {
@@ -30,25 +32,46 @@ void BlockData::Rotate(HorizontalDirection direction)
 BlockData BlockData::FromBlockType(BlockType type)
 {
 	// horizontal line on the second line
-	static const BlockData I = BlockData({ 4, 4, { { false, false, false, false }, { true, true, true, true }, { false, false, false, false }, { false, false, false, false } } });
+	static const BlockData I = BlockData(4, 4, std::vector<bool>({ 
+		false, false, false, false, 
+		true, true, true, true, 
+		false, false, false, false, 
+		false, false, false, false }));
 
 	// 2x2 square on top-middle
-	static const BlockData O = BlockData({ 2, 2, { { true, true }, { true, true }, } });
+	static const BlockData O = BlockData(2, 2, std::vector<bool>({ 
+		true, true,
+		true, true }));
 
 	// 3x3 upwards pointing 'T'
-	static const BlockData T = BlockData({ 3, 3, { { false, true, false }, { true, true, true }, { false, false, false } } });
+	static const BlockData T = BlockData( 3, 3, std::vector<bool>({ 
+		false, true, false, 
+		true, true, true, 
+		false, false, false }));
 
 	// 3x3 'S' on top two lines
-	static const BlockData S = BlockData({ 3, 3, { { false, true, true }, { true, true, false }, { false, false, false } } });
+	static const BlockData S = BlockData(3, 3, std::vector<bool>({ 
+		false, true, true, 
+		true, true, false, 
+		false, false, false }));
 
 	// 3x3 'Z' on top two lines
-	static const BlockData Z = BlockData({ 3, 3, { { true, true, false }, { false, true, true }, { false, false, false } } });
+	static const BlockData Z = BlockData(3, 3, std::vector<bool>({ 
+		true, true, false, 
+		false, true, true, 
+		false, false, false }));
 
 	// 3x3 'J' on top two lines
-	static const BlockData J = BlockData({ 3, 3, { { true, false, false }, { true, true, true }, { false, false, false } } });
+	static const BlockData J = BlockData(3, 3, std::vector<bool>({
+		true, false, false, 
+		true, true, true, 
+		false, false, false}));
 
 	// 3x3 'L' on top two lines
-	static const BlockData L = BlockData({ 3, 3, { { false, false, true }, { true, true, true }, { false, false, false } } });
+	static const BlockData L = BlockData(3, 3, std::vector<bool>({ 
+		false, false, true, 
+		true, true, true, 
+		false, false, false}));
 
 	switch (type)
 	{

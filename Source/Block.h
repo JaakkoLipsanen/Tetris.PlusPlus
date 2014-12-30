@@ -47,7 +47,6 @@ public:
 		return _topLeftPosition;
 	}
 
-
 	Rectangle GetBoundingArea() const;
 
 private:
