@@ -7,6 +7,8 @@
 static const float BlockFallingRate = 0.4f;
 static const float BlockHorizontalMoveRate = 0.075f;
 
+static const int SoftDropScorePerCell = 1;
+static const int HardDropScorePerCell = 2;
 static const int LinesClearedScoring[] = {
 	0,
 	100, // 1 line cleared == 100p 
@@ -37,7 +39,7 @@ struct Level::Impl
 
 			if (didMove && this->FallingSpeed == BlockFallingSpeed::Fast)
 			{
-				this->CurrentScore += 1; // every move that is made during "soft drop" grants 1 point
+				this->CurrentScore += SoftDropScorePerCell; // every move that is made during "soft drop" grants points
 			}
 		}
 	}
@@ -78,10 +80,10 @@ const Board& Level::GetBoard() const { return _pImpl->Board; }
 
 void Level::InstantDropBlock()
 {
-	auto ghost = _pImpl->Board.GetGhostBlock();
-	int distanceToGround = _pImpl->Board.GetCurrentBlock().GetBottomLeftPosition().Y - ghost.GetBottomLeftPosition().Y;
+	auto ghostBlock = _pImpl->Board.GetGhostBlock();
+	int distanceToGround = _pImpl->Board.GetCurrentBlock().GetBottomLeftPosition().Y - ghostBlock.GetBottomLeftPosition().Y;
 
-	_pImpl->CurrentScore += 2 * distanceToGround; // hard drop grants 2 points for every cell the block drops
+	_pImpl->CurrentScore += HardDropScorePerCell * distanceToGround; // hard drop grants points for every cell the block drops
 	this->GetBoard().InstantDropBlock();
 }
 
