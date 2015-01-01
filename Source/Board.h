@@ -1,6 +1,8 @@
 #pragma once
 #include <Block.h>
 #include <BlockGenerator.h>
+#include <Core/Event.h>
+
 #include <memory>
 
 class Board
@@ -10,6 +12,8 @@ public:
 	static const int Height = 24;
 	static const int VisibleHeight = 20;
 
+	Event<void(int)> LinesCleared; // the int-parameter tells how many lines were cleared
+
 	explicit Board(std::unique_ptr<IBlockGenerator> generator);
 	~Board();
 
@@ -18,12 +22,14 @@ public:
 
 	void MoveBlock(HorizontalDirection direction);
 	void InstantDropBlock();
-	void TickVertically();
+	bool TickVertically(); // returns true if current block moved one block down succesfully; false otherwise
 	void ToggleBlockHolding();
 	void RotateBlock();
 
 	BlockType GetNextBlock() const;
 	BlockType GetHoldedBlock() const;
+
+	const Block& GetCurrentBlock() const;
 	Block GetGhostBlock() const;
 
 private:

@@ -14,9 +14,11 @@ public:
 	~Level();
 	void Update();
 
+	int GetCurrentScore() const;
 	Board& GetBoard();
 	const Board& GetBoard() const;
 
+	void InstantDropBlock();
 	void MoveBlock(HorizontalDirection direction);
 	void SetBlockFallingSpeed(BlockFallingSpeed fallingSpeed);
 

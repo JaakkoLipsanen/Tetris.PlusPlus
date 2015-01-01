@@ -3,10 +3,12 @@
 
 #include <Graphics/SpriteBatch.h>
 #include <Graphics/TextureHelper.h>
+#include <Graphics/Font.h>
 #include <Graphics/Post Processing/PostProcessRenderer.h>
 #include <Graphics/Post Processing/Vignette.h>
 #include <Graphics/Post Processing/ColorAdjust.h>
 
+#include <Content/Content.h>
 #include <Engine/Screen.h>
 
 static const int BlockSize = 32;
@@ -85,10 +87,13 @@ struct LevelRenderer::Impl
 		this->SpriteBatch->Draw(*this->BlankPixel, position, GetBlockColor(type) * alpha, 0, Vector2f::One * BlockSize);
 	}
 
-	void DrawPreviewBlock(Vector2f position, BlockType type)
+	void DrawPreviewBlock(Vector2f position, BlockType type, const std::string& title)
 	{
 		static const float Size = 4.5f;
 		this->SpriteBatch->Draw(*this->BlankPixel, position, GetBlockColor(BlockType::Empty), 0, Vector2f::One * BlockSize * Size);
+
+		float centerX = position.X + (Size / 2.0f) * BlockSize;
+		this->SpriteBatch->DrawText(*this->Font, title, Vector2f(centerX, position.Y - this->Font->MeasureText(title).Height / 2.0f - 8), GetBlockColor(BlockType::Empty), TextCorner::Center);
 
 		if (type != BlockType::Empty)
 		{
@@ -100,6 +105,8 @@ struct LevelRenderer::Impl
 	GraphicsContext* GraphicsContext;
 	std::unique_ptr<Texture2D> BlankPixel;
 	std::unique_ptr<SpriteBatch> SpriteBatch;
+	std::unique_ptr<Font> Font;
+	std::unique_ptr<::Font> FontSmall;
 	std::unique_ptr<PostProcessRenderer> PostProcessRenderer;
 	const Level& Level;
 };
@@ -115,6 +122,8 @@ void LevelRenderer::LoadContent(GraphicsContext& graphicsContext)
 	_pImpl->GraphicsContext = &graphicsContext;
 	_pImpl->SpriteBatch.reset(new SpriteBatch(graphicsContext));
 	_pImpl->BlankPixel = TextureHelper::CreateBlankTexture(graphicsContext);
+	_pImpl->Font = Content::LoadFont(graphicsContext, "Fonts/Wonder.ttf", 32);
+	_pImpl->FontSmall = Content::LoadFont(graphicsContext, "Fonts/Wonder.ttf", 24);
 	_pImpl->PostProcessRenderer.reset(new PostProcessRenderer(graphicsContext));
 
 	_pImpl->PostProcessRenderer->AddPostProcess(std::make_shared<ColorAdjustPostProcess>(graphicsContext));
@@ -135,8 +144,11 @@ void LevelRenderer::Render()
 	_pImpl->SpriteBatch->Begin();
 	_pImpl->DrawBoard();
 	_pImpl->DrawGhostBlock();
-	_pImpl->DrawPreviewBlock(Vector2f(26, 48), _pImpl->Level.GetBoard().GetNextBlock());
-	_pImpl->DrawPreviewBlock(Vector2f(Screen::GetWidth() - 26 * 2 - 26 * 4.5f, 48), _pImpl->Level.GetBoard().GetHoldedBlock());
+	_pImpl->DrawPreviewBlock(Vector2f(26, 48), _pImpl->Level.GetBoard().GetNextBlock(), "Next");
+	_pImpl->DrawPreviewBlock(Vector2f(Screen::GetWidth() - 26 * 2 - 26 * 4.5f, 48), _pImpl->Level.GetBoard().GetHoldedBlock(), "Hold");
+	_pImpl->SpriteBatch->DrawText(*_pImpl->FontSmall, "Score", Vector2f(100, 214), GetBlockColor(BlockType::Empty), TextCorner::Center);
+	_pImpl->SpriteBatch->DrawText(*_pImpl->FontSmall, std::to_string(_pImpl->Level.GetCurrentScore()), Vector2f(100, 240), GetBlockColor(BlockType::Empty), TextCorner::Center);
+
 	_pImpl->SpriteBatch->End();
 
 	_pImpl->PostProcessRenderer->Render(nullptr);

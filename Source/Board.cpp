@@ -5,8 +5,8 @@
 
 struct Board::Impl
 {
-	explicit Board::Impl(std::unique_ptr<IBlockGenerator> generator) :
-		Generator(std::move(generator)), HoldedBlock(BlockType::Empty)
+	explicit Board::Impl(std::unique_ptr<IBlockGenerator> generator, Event<void(int)>& lineClearedEvent) :
+		Generator(std::move(generator)), HoldedBlock(BlockType::Empty), LinesCleared(lineClearedEvent)
 	{
 		this->SpawnNextBlock();
 		std::fill(std::begin(this->Blocks), std::end(this->Blocks), BlockType::Empty);
@@ -97,6 +97,7 @@ struct Board::Impl
 
 	void CheckForLineCompletion()
 	{
+		int linesRemoved = 0;
 		for (int y = 0; y < Board::Height; y++)
 		{
 			bool isFullLine = true;
@@ -113,7 +114,13 @@ struct Board::Impl
 			{
 				this->DeleteLine(y);
 				y--; // since all the above lines were moved down, we need to compensate it in the 'y'
+				linesRemoved++;
 			}
+		}
+
+		if (linesRemoved > 0)
+		{
+			this->LinesCleared.Invoke(linesRemoved);
 		}
 	}
 
@@ -133,10 +140,12 @@ struct Board::Impl
 	std::unique_ptr<IBlockGenerator> Generator;
 	std::unique_ptr<Block> CurrentBlock; // cannot be plain "Block CurrentBlock;" since Block is uncopyable...
 	BlockType HoldedBlock;
+
+	Event<void(int)>& LinesCleared;
 };
 
 Board::Board(std::unique_ptr<IBlockGenerator> generator) :
-	_pImpl(new Board::Impl(std::move(generator)))
+	LinesCleared(), _pImpl(new Board::Impl(std::move(generator), this->LinesCleared))
 {
 }
 Board::~Board() = default;
@@ -174,18 +183,18 @@ void Board::InstantDropBlock()
 	_pImpl->SpawnNextBlock();
 }
 
-void Board::TickVertically()
+bool Board::TickVertically()
 {
 	Block copy = *_pImpl->CurrentBlock;
 	copy.MoveDown();
 	if (_pImpl->CollidesWithBlocks(copy)) // the current block would be colliding with other blocks after moving.
 	{
 		_pImpl->FreezeCurrentBlock();
-
-		return;
+		return false; // block didnt move down
 	}
 
 	_pImpl->CurrentBlock->MoveDown();
+	return true; // block moved one cell down
 }
 
 void Board::ToggleBlockHolding()
@@ -217,6 +226,11 @@ void Board::RotateBlock()
 BlockType Board::GetHoldedBlock() const
 {
 	return _pImpl->HoldedBlock;
+}
+
+const Block& Board::GetCurrentBlock() const
+{
+	return *_pImpl->CurrentBlock;
 }
 
 BlockType Board::GetNextBlock() const

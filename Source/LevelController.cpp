@@ -21,7 +21,7 @@ void LevelController::Control()
 
 	if (Input::IsNewKeyPress(KeyCode::Space))
 	{
-		_level.GetBoard().InstantDropBlock();
+		_level.InstantDropBlock();
 	}
 
 	if (Input::IsNewKeyPress(KeyCode::LeftShift))
