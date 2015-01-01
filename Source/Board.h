@@ -7,7 +7,7 @@ class Board
 {
 public:
 	static const int Width = 10;
-	static const int Height = 22;
+	static const int Height = 24;
 	static const int VisibleHeight = 20;
 
 	explicit Board(std::unique_ptr<IBlockGenerator> generator);

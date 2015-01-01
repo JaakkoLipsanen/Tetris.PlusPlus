@@ -59,7 +59,7 @@ struct LevelRenderer::Impl
 		Block ghostBlock = board.GetGhostBlock();
 
 		Vector2f startLocation = (static_cast<Vector2f>(Screen::GetSize().ToVector2i()) - Vector2f(board.Width, board.VisibleHeight) * BlockSize) / 2.0f;
-		Vector2f blockAdjustment = Vector2f(ghostBlock.GetBottomLeftPosition().X, Board::Height - 2 - ghostBlock.GetBoundingArea().MaxY()) * BlockSize;
+		Vector2f blockAdjustment = Vector2f(ghostBlock.GetBottomLeftPosition().X, Board::VisibleHeight - ghostBlock.GetBoundingArea().MaxY()) * BlockSize;
 		this->DrawBlock(startLocation + blockAdjustment, ghostBlock.GetData(), ghostBlock.Type, GhostBlockAlpha);
 	}
 
