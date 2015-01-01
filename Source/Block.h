@@ -43,13 +43,14 @@ public:
 		return _data;
 	}
 
-	inline Vector2i GetTopLeftPosition() const {
-		return _topLeftPosition;
+	inline Vector2i GetBottomLeftPosition() const {
+		return _bottomLeftPosition;
 	}
 
 	Rectangle GetBoundingArea() const;
+	Rectangle GetBlockArea() const;
 
 private:
-	Vector2i _topLeftPosition;
+	Vector2i _bottomLeftPosition;
 	BlockData _data;
 };

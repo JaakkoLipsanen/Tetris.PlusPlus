@@ -1,9 +1,10 @@
 #include <Engine/Game.h>
+#include <GameScene.h>
 #include <Core/WindowDescription.h>
 
-#include <GameScene.h>
 #include <Core/Color.h>
 #include <Graphics/GraphicsContext.h>
+#include <Core/IGameWindow.h>
 
 class TetrisGame : public Game
 {
@@ -16,9 +17,15 @@ protected:
 	void SetupWindow(WindowDescription& description) override
 	{
 		description.Resolution = Size(720, 720);
+		description.HasBorders = false;
 	}
 
-	void PostRender() override
+	void Initialize() override
+	{
+		this->GetWindow().SetPosition(Vector2i(750, 350));
+	}
+
+	void PreRender() override
 	{
 		this->GetGraphicsContext().Clear(Color::White);
 	}

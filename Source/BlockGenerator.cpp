@@ -1,23 +1,29 @@
 #include <BlockGenerator.h>
-#include <Diagnostics/Ensure.h>
 #include <Core/Array.h>
+#include <Engine/Time.h>
+
 #include <random>
+#include <Diagnostics/Ensure.h>
 
 BlockType BlockGenerator::Next()
 {
-	if (_blockBag.size() == 0)
-	{
+	if (_blockBag.empty()) {
 		this->GeneratePermutation();
 	}
 
 	auto next = this->PeekNext();
 	_blockBag.pop_back();
+
+	if (_blockBag.empty()) {
+		this->GeneratePermutation();
+	}
+
 	return next;
 }
 
 BlockType BlockGenerator::PeekNext() const
 {
-	Ensure::True(_blockBag.size() > 0);
+	Ensure::False(_blockBag.empty(), "The bag is empty!");
 	return _blockBag.back();
 }
 
@@ -27,5 +33,5 @@ void BlockGenerator::GeneratePermutation()
 	_blockBag.assign(Values, Values + Array::Length(Values));
 
 	// shuffle the values \o/
-	std::shuffle(_blockBag.begin(), _blockBag.end(), std::default_random_engine());
+	std::shuffle(_blockBag.begin(), _blockBag.end(), std::default_random_engine(Time::GetSystemTime()));
 }

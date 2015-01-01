@@ -5,20 +5,28 @@
 
 class Board
 {
-	explicit Board( std::unique_ptr<IBlockGenerator> generator)
-		: _generator(std::move(generator)),  _currentBlock(Block(_generator->Next()))
-	{
-	}
-
 public:
 	static const int Width = 10;
 	static const int Height = 22;
 	static const int VisibleHeight = 20;
 
-	BlockType At(int x, int y) const;
+	explicit Board(std::unique_ptr<IBlockGenerator> generator);
+	~Board();
+
+	BlockType At(int x, int y) const; // y == 0 is at bottom
+	BlockType AtVisually(int x, int y) const; // in this scenario, y == 0 is at top (of VisibleHeight)
+
+	void MoveBlock(HorizontalDirection direction);
+	void InstantDropBlock();
+	void TickVertically();
+	void ToggleBlockHolding();
+	void RotateBlock();
+
+	BlockType GetNextBlock() const;
+	BlockType GetHoldedBlock() const;
+	Block GetGhostBlock() const;
 
 private:
-	BlockType _blocks[Board::Width * Board::Height];
-	std::unique_ptr<IBlockGenerator> _generator;
-	Block _currentBlock;
+	struct Impl;
+	std::unique_ptr<Impl> _pImpl;
 };

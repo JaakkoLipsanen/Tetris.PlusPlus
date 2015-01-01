@@ -23,10 +23,48 @@ void BlockData::Rotate(HorizontalDirection direction)
 		for (int x = 0; x < this->Width; x++)
 		{
 			int newY = x;
-			int newX = this->Width - y;
+			int newX = this->Width - y - 1;
 			_data[newX + newY * this->Width] = copiedData[x + y * this->Width];
 		}
 	}
+}
+
+const BlockData BlockData::GetTrimmed() const
+{
+	int minX = this->Width - 1;
+	int maxX = 0;
+
+	int minY = this->Height - 1;
+	int maxY = 0;
+
+	for (int y = 0; y < this->Height; y++)
+	{
+		for (int x = 0; x < this->Width; x++)
+		{
+			if (this->At(x, y))
+			{
+				minX = std::min(minX, x);
+				minY = std::min(minY, y);
+
+				maxX = std::max(maxX, x);
+				maxY = std::max(maxY, y);
+			}
+		}
+	}
+
+	int newWidth = maxX - minX + 1;
+	int newHeight = maxY - minY + 1;
+
+	std::vector<bool> data(newWidth * newHeight);
+	for (int y = 0; y < newHeight; y++)
+	{
+		for (int x = 0; x < newWidth; x++)
+		{
+			data[x + y * newWidth] = this->At(x + minX, y + minY);
+		}
+	}
+
+	return BlockData(newWidth, newHeight, data);
 }
 
 BlockData BlockData::FromBlockType(BlockType type)
