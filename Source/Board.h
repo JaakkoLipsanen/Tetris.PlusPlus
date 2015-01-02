@@ -13,6 +13,7 @@ public:
 	static const int VisibleHeight = 20;
 
 	Event<void(int)> LinesCleared; // the int-parameter tells how many lines were cleared
+	Event<void()> GameOver;
 
 	explicit Board(std::unique_ptr<IBlockGenerator> generator);
 	~Board();

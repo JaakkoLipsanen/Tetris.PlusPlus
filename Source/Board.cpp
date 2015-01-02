@@ -5,11 +5,11 @@
 
 struct Board::Impl
 {
-	explicit Board::Impl(std::unique_ptr<IBlockGenerator> generator, Event<void(int)>& lineClearedEvent) :
-		Generator(std::move(generator)), HoldedBlock(BlockType::Empty), LinesCleared(lineClearedEvent)
+	explicit Board::Impl(std::unique_ptr<IBlockGenerator> generator, Event<void(int)>& lineClearedEvent, Event<void()>& gameOver) :
+		Generator(std::move(generator)), HoldedBlock(BlockType::Empty), LinesCleared(lineClearedEvent), GameOver(gameOver)
 	{
-		this->SpawnNextBlock();
 		std::fill(std::begin(this->Blocks), std::end(this->Blocks), BlockType::Empty);
+		this->SpawnNextBlock();
 	}
 
 	void SpawnNextBlock()
@@ -19,7 +19,16 @@ struct Board::Impl
 
 	void SpawnNextBlock(BlockType type)
  	{
+		if (this->IsGameOver)
+		{
+			return;
+		}
+
 		this->CurrentBlock.reset(new Block(type));
+		if (this->CollidesWithBlocks(*this->CurrentBlock))
+		{
+			this->EndGame();
+		}
 	}
 
 	BlockType AtInternal(int x, int y, bool allowFallingBlock)
@@ -70,8 +79,11 @@ struct Board::Impl
 
 	void FreezeCurrentBlock()
 	{
-		this->FreezeBlock(*this->CurrentBlock);
-		this->SpawnNextBlock();
+		this->FreezeBlock(*this->CurrentBlock);  
+		if (!this->IsGameOver)
+		{
+			this->SpawnNextBlock();
+		}
 	}
 
 	void FreezeBlock(Block& block)
@@ -84,6 +96,12 @@ struct Board::Impl
 				if (data.At(x, y))
 				{
 					Vector2i realIndex = Vector2i(x, y) + block.GetBottomLeftPosition();
+					if (realIndex.Y >= Board::VisibleHeight)
+					{
+						this->EndGame();
+						return;
+					}
+
 					if (realIndex.Y < Board::Height && realIndex.Y >= 0)
 					{
 						this->Blocks[realIndex.X + realIndex.Y * Board::Width] = block.Type;
@@ -136,16 +154,24 @@ struct Board::Impl
 		}
 	}
 
+	void EndGame()
+	{
+		this->IsGameOver = true;
+		this->GameOver.Invoke();
+	}
+
 	BlockType Blocks[Board::Width * Board::Height];
 	std::unique_ptr<IBlockGenerator> Generator;
 	std::unique_ptr<Block> CurrentBlock; // cannot be plain "Block CurrentBlock;" since Block is uncopyable...
 	BlockType HoldedBlock;
 
 	Event<void(int)>& LinesCleared;
+	Event<void()>& GameOver;
+	bool IsGameOver = false;
 };
 
 Board::Board(std::unique_ptr<IBlockGenerator> generator) :
-	LinesCleared(), _pImpl(new Board::Impl(std::move(generator), this->LinesCleared))
+	LinesCleared(), _pImpl(new Board::Impl(std::move(generator), this->LinesCleared, this->GameOver))
 {
 }
 Board::~Board() = default;
@@ -166,6 +192,11 @@ BlockType Board::AtVisually(int x, int y) const
 
 void Board::MoveBlock(HorizontalDirection direction)
 {
+	if (_pImpl->IsGameOver)
+	{
+		return;
+	}
+
 	Block copy = *_pImpl->CurrentBlock;
 	copy.MoveHorizontally(direction);
 	if (_pImpl->CollidesWithBlocks(copy)) // the current block would be colliding with other blocks after moving.
@@ -178,6 +209,11 @@ void Board::MoveBlock(HorizontalDirection direction)
 
 void Board::InstantDropBlock()
 {
+	if (_pImpl->IsGameOver)
+	{
+		return;
+	}
+
 	auto ghost = this->GetGhostBlock();
 	_pImpl->FreezeBlock(ghost);
 	_pImpl->SpawnNextBlock();
@@ -185,6 +221,11 @@ void Board::InstantDropBlock()
 
 bool Board::TickVertically()
 {
+	if (_pImpl->IsGameOver)
+	{
+		return false;
+	}
+
 	Block copy = *_pImpl->CurrentBlock;
 	copy.MoveDown();
 	if (_pImpl->CollidesWithBlocks(copy)) // the current block would be colliding with other blocks after moving.
@@ -199,6 +240,11 @@ bool Board::TickVertically()
 
 void Board::ToggleBlockHolding()
 {
+	if (_pImpl->IsGameOver)
+	{
+		return;
+	}
+
 	if (_pImpl->HoldedBlock == BlockType::Empty)
 	{
 		_pImpl->HoldedBlock = _pImpl->CurrentBlock->Type;
@@ -213,6 +259,11 @@ void Board::ToggleBlockHolding()
 
 void Board::RotateBlock()
 {
+	if (_pImpl->IsGameOver)
+	{
+		return;
+	}
+
 	Block copy = *_pImpl->CurrentBlock;
 	copy.Rotate();
 	if (_pImpl->CollidesWithBlocks(copy)) // the current block would be colliding with other blocks after moving.
