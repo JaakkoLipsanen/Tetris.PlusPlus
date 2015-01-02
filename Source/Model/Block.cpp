@@ -1,8 +1,7 @@
-#include <Block.h>
-#include <Board.h>
-#include <BlockData.h>
+#include <Model/Block.h>
+#include <Model/Board.h>
+#include <Model/BlockData.h>
 
-#include <Diagnostics/Ensure.h>
 #include <Math/Rectangle.h>
 
 /* Block */

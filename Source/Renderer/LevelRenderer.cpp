@@ -1,5 +1,5 @@
-#include <LevelRenderer.h>
-#include <Level.h>
+#include <Renderer/LevelRenderer.h>
+#include <Model/Level.h>
 
 #include <Graphics/SpriteBatch.h>
 #include <Graphics/TextureHelper.h>

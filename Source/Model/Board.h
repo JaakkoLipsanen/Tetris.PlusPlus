@@ -1,6 +1,6 @@
 #pragma once
-#include <Block.h>
-#include <BlockGenerator.h>
+#include <Model/Block.h>
+#include <Model/BlockGenerator.h>
 #include <Core/Event.h>
 
 #include <memory>

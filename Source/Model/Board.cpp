@@ -1,4 +1,4 @@
-#include <Board.h>
+#include <Model/Board.h>
 
 #include <Diagnostics/Ensure.h>
 #include <Math/Rectangle.h>

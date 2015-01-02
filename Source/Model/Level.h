@@ -1,5 +1,5 @@
 #pragma once
-#include <Board.h>
+#include <Model/Board.h>
 
 enum class BlockFallingSpeed
 {

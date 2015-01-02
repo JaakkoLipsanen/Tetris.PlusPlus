@@ -1,4 +1,4 @@
-#include <BlockGenerator.h>
+#include <Model/BlockGenerator.h>
 #include <Core/Array.h>
 #include <Engine/Time.h>
 

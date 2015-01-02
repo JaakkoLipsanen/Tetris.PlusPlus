@@ -1,4 +1,4 @@
-#include <GameScene.h>
+#include <Scenes/GameScene.h>
 
 #include <Engine/Game.h>
 #include <Input/Input.h>

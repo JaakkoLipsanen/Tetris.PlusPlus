@@ -1,5 +1,5 @@
 #include <Engine/Game.h>
-#include <GameScene.h>
+#include <Scenes/GameScene.h>
 #include <Core/WindowDescription.h>
 
 #include <Core/Color.h>

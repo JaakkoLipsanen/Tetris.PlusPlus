@@ -1,8 +1,8 @@
 #pragma once
 #include <Engine/Scene.h>
-#include <Level.h>
-#include <LevelRenderer.h>
-#include <LevelController.h>
+#include <Model/Level.h>
+#include <Renderer/LevelRenderer.h>
+#include <Controller/LevelController.h>
 
 class GameScene : public Scene
 {

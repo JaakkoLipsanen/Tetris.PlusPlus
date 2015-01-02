@@ -1,5 +1,5 @@
-#include <BlockData.h>
-#include <Block.h>
+#include <Model/BlockData.h>
+#include <Model/Block.h>
 
 #include <Diagnostics/Ensure.h>
 #include <array>

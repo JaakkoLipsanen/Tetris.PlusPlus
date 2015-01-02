@@ -1,5 +1,5 @@
 #pragma once
-#include <BlockData.h>
+#include <Model/BlockData.h>
 #include <Math/Direction.h>
 
 enum class BlockType

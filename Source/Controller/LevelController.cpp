@@ -1,5 +1,5 @@
-#include <LevelController.h>
-#include <Level.h>
+#include <Controller/LevelController.h>
+#include <Model/Level.h>
 #include <Input/Input.h>
 
 void LevelController::Control()
