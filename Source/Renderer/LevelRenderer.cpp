@@ -1,34 +1,12 @@
 #include <Renderer/LevelRenderer.h>
+#include <Renderer/TetrisVisuals.h>
 #include <Model/Level.h>
 
 #include <Graphics/SpriteBatch.h>
 #include <Graphics/TextureHelper.h>
 #include <Graphics/Font.h>
-#include <Graphics/Post Processing/PostProcessRenderer.h>
-#include <Graphics/Post Processing/Vignette.h>
-#include <Graphics/Post Processing/ColorAdjust.h>
-
 #include <Content/Content.h>
 #include <Engine/Screen.h>
-
-static const int BlockSize = 32;
-Color GetBlockColor(BlockType type)
-{
-	switch (type)
-	{
-	case BlockType::Empty: return Color(192, 192, 192);
-	case BlockType::I: return Color::Cyan;
-	case BlockType::J: return Color::Blue;
-	case BlockType::L: return Color::Orange;
-	case BlockType::O: return Color::Yellow;
-	case BlockType::S: return Color::Lime;
-	case BlockType::T: return Color::DarkMagenta;
-	case BlockType::Z: return Color::Red;
-
-	default:
-		throw std::invalid_argument("Invalid type");
-	}
-}
 
 struct LevelRenderer::Impl
 {
@@ -107,7 +85,6 @@ struct LevelRenderer::Impl
 	std::unique_ptr<SpriteBatch> SpriteBatch;
 	std::unique_ptr<Font> Font;
 	std::unique_ptr<::Font> FontSmall;
-	std::unique_ptr<PostProcessRenderer> PostProcessRenderer;
 	const Level& Level;
 };
 
@@ -124,23 +101,14 @@ void LevelRenderer::LoadContent(GraphicsContext& graphicsContext)
 	_pImpl->BlankPixel = TextureHelper::CreateBlankTexture(graphicsContext);
 	_pImpl->Font = Content::LoadFont(graphicsContext, "Fonts/Wonder.ttf", 32);
 	_pImpl->FontSmall = Content::LoadFont(graphicsContext, "Fonts/Wonder.ttf", 24);
-	_pImpl->PostProcessRenderer.reset(new PostProcessRenderer(graphicsContext));
-
-	_pImpl->PostProcessRenderer->AddPostProcess(std::make_shared<ColorAdjustPostProcess>(graphicsContext));
-	_pImpl->PostProcessRenderer->AddPostProcess(std::make_shared<VignettePostProcess>(graphicsContext));
 }
 
 void LevelRenderer::Update()
 {
-	_pImpl->PostProcessRenderer->Get<ColorAdjustPostProcess>()->SetSaturationMultiplier(
-		0.4f); //FlaiMath::PingPong(Time::GetTotalTime(), 1.0f));
 }
 
 void LevelRenderer::Render()
 {
-	_pImpl->PostProcessRenderer->BeginRender();
-	_pImpl->GraphicsContext->Clear(Color::White);
-
 	_pImpl->SpriteBatch->Begin();
 	_pImpl->DrawBoard();
 	_pImpl->DrawGhostBlock();
@@ -150,6 +118,4 @@ void LevelRenderer::Render()
 	_pImpl->SpriteBatch->DrawText(*_pImpl->FontSmall, std::to_string(_pImpl->Level.GetCurrentScore()), Vector2f(100, 240), GetBlockColor(BlockType::Empty), TextCorner::Center);
 
 	_pImpl->SpriteBatch->End();
-
-	_pImpl->PostProcessRenderer->Render(nullptr);
 }

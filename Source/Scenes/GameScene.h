@@ -1,10 +1,10 @@
 #pragma once
-#include <Engine/Scene.h>
+#include <Scenes/FadeableScene.h>
 #include <Model/Level.h>
 #include <Renderer/LevelRenderer.h>
 #include <Controller/LevelController.h>
 
-class GameScene : public Scene
+class GameScene : public FadeableScene
 {
 public:
 	GameScene();

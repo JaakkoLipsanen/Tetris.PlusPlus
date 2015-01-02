@@ -10,6 +10,8 @@ enum class BlockFallingSpeed
 class Level
 {
 public:
+	Event<void(int)> GameOver; // int parameter == final score of the game
+
 	Level();
 	~Level();
 	void Update();

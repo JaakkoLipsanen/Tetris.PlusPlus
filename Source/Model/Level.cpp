@@ -72,6 +72,10 @@ struct Level::Impl
 Level::Level() :
 	_pImpl(new Level::Impl())
 {
+	_pImpl->Board.GameOver += [this]()
+	{
+		this->GameOver.Invoke(_pImpl->CurrentScore);
+	};
 }
 Level::~Level() = default;
 

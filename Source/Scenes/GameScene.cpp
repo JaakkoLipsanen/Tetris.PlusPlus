@@ -1,12 +1,15 @@
 #include <Scenes/GameScene.h>
+#include <Scenes/GameOverScene.h>
 
 #include <Engine/Game.h>
-#include <Input/Input.h>
-#include <Engine/ISceneManager.h>
 
 GameScene::GameScene() :
-	_level(), _levelRenderer(_level), _levelController(_level)
+	FadeableScene(0.25f, Color::White), _level(), _levelRenderer(_level), _levelController(_level)
 {
+	_level.GameOver += [this](int finalScore)
+	{
+		this->ChangeScene(std::unique_ptr<Scene>(new GameOverScene(finalScore)));
+	};
 }
 
 void GameScene::OnEntering()
@@ -19,11 +22,6 @@ void GameScene::Update()
 	_levelController.Control();
 	_level.Update();
 	_levelRenderer.Update();
-
-	if (Input::IsNewKeyPress(KeyCode::LeftControl))
-	{
-		this->GetSceneManager().LoadScene(std::unique_ptr<Scene>(new GameScene));
-	}
 }
 
 void GameScene::Render()
