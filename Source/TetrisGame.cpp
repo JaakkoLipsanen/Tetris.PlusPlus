@@ -2,6 +2,7 @@
 #include <Scenes/MainMenuScene.h>
 #include <Core/WindowDescription.h>
 
+#include <Engine/Monitor.h>
 #include <Core/Color.h>
 #include <Core/IGameWindow.h>
 #include <Graphics/GraphicsContext.h>
@@ -21,12 +22,12 @@ protected:
 	void SetupWindow(WindowDescription& description) override
 	{
 		description.Resolution = Size(720, 720);
-		description.HasBorders = true;
+		description.HasBorders = false;
 	}
 
 	void Initialize() override
 	{
-		this->GetWindow().SetPosition(Vector2i(750, 350));
+		this->GetWindow().SetPosition((Monitor::GetPrimaryMonitor()->GetSize().ToVector2i() - Vector2i(720, 720)) / 2.0f);
 
 		auto& graphicsContext = this->GetGraphicsContext();
 		this->PostProcessRenderer.reset(new ::PostProcessRenderer(graphicsContext));
