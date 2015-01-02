@@ -1,5 +1,5 @@
 #include <Engine/Game.h>
-#include <Scenes/GameScene.h>
+#include <Scenes/MainMenuScene.h>
 #include <Core/WindowDescription.h>
 
 #include <Core/Color.h>
@@ -15,7 +15,7 @@ class TetrisGame : public Game
 protected:
 	std::unique_ptr<Scene> CreateDefaultScene() override
 	{
-		return std::unique_ptr<Scene>(new GameScene());
+		return std::unique_ptr<Scene>(new MainMenuScene());
 	}
 
 	void SetupWindow(WindowDescription& description) override

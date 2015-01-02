@@ -1,7 +1,9 @@
 #include <Scenes/GameScene.h>
 #include <Scenes/GameOverScene.h>
+#include <Scenes/MainMenuScene.h>
 
 #include <Engine/Game.h>
+#include <Input/Input.h>
 
 GameScene::GameScene() :
 	FadeableScene(0.25f, Color::White), _level(), _levelRenderer(_level), _levelController(_level)
@@ -22,6 +24,11 @@ void GameScene::Update()
 	_levelController.Control();
 	_level.Update();
 	_levelRenderer.Update();
+
+	if (Input::IsNewKeyPress(KeyCode::Escape))
+	{
+		this->ChangeScene(std::unique_ptr<Scene>(new MainMenuScene()));
+	}
 }
 
 void GameScene::Render()

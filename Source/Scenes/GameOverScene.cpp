@@ -1,5 +1,6 @@
 #include <Scenes/GameOverScene.h>
 #include <Scenes/GameScene.h>
+#include <Scenes/MainMenuScene.h>
 #include <Renderer/TetrisVisuals.h>
 
 #include <Engine/Game.h>
@@ -47,6 +48,10 @@ void GameOverScene::Update()
 	if (Input::IsNewKeyPress(KeyCode::Enter))
 	{
 		this->ChangeScene(std::unique_ptr<Scene>(new GameScene()));
+	}
+	else if (Input::IsNewKeyPress(KeyCode::Escape))
+	{
+		this->ChangeScene(std::unique_ptr<Scene>(new MainMenuScene()));
 	}
 }
 

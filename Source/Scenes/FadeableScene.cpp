@@ -19,8 +19,8 @@ enum class FadeState
 
 struct FadeableScene::Impl
 {
-	FadeableScene::Impl(float fadeTime, Color fadeColor)
-		: FadeState(FadeState::FadingIn), FadeAlpha(static_cast<int>(1)), FadeTime(fadeTime), FadeColor(fadeColor)
+	FadeableScene::Impl(float fadeTime, Color fadeColor) :
+		 FadeState(FadeState::FadingIn), FadeAlpha(static_cast<int>(1)), FadeTime(fadeTime), FadeColor(fadeColor)
 	{
 		
 	}
@@ -33,8 +33,8 @@ struct FadeableScene::Impl
 	const Color FadeColor;
 };
 
-FadeableScene::FadeableScene(float fadeTime, Color fadeColor)
-	: _pImpl(new FadeableScene::Impl(fadeTime, fadeColor))
+FadeableScene::FadeableScene(float fadeTime, Color fadeColor) :
+	 _pImpl(new FadeableScene::Impl(fadeTime, fadeColor))
 {
 }
 FadeableScene::~FadeableScene() = default;
@@ -78,6 +78,12 @@ void FadeableScene::PostRender()
 
 void FadeableScene::ChangeScene(std::unique_ptr<Scene> sceneToLoad)
 {
+	// another scene is already loading
+	if (_pImpl->SceneToLoad.get() != nullptr)
+	{
+		return;
+	}
+
 	Ensure::NotNull(sceneToLoad.get());
 	_pImpl->SceneToLoad.reset(sceneToLoad.release());
 	_pImpl->FadeState = FadeState::FadingOut;
