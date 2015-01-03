@@ -10,6 +10,8 @@
 #include <Engine/Screen.h>
 
 #include <Math/RectangleF.h>
+#include <Math/FlaiMath.h>
+#include <Engine/Time.h>
 
 struct LevelRenderer::Impl
 {
@@ -22,7 +24,7 @@ struct LevelRenderer::Impl
 	{
 		auto& board = this->Level.GetBoard();
 		Vector2f topLeft = (static_cast<Vector2f>(Screen::GetSize().ToVector2i()) - Vector2f(board.Width, board.VisibleHeight) * BlockSize) / 2.0f;
-		return RectangleF(topLeft.X, topLeft.Y, board.Width * BlockSize, board.VisibleHeight * BlockSize);
+		return RectangleF(topLeft.X, topLeft.Y - board.VisibleHeight * BlockSize, board.Width * BlockSize, board.VisibleHeight * BlockSize);
 	}
 
 	void DrawBoard()
@@ -127,6 +129,7 @@ struct LevelRenderer::Impl
 
 	GraphicsContext* GraphicsContext;
 	std::unique_ptr<Texture2D> BlankPixel;
+	std::unique_ptr<Texture2D> VignetteTexture;
 	std::unique_ptr<Texture2D> FadeTexture;
 	std::unique_ptr<SpriteBatch> SpriteBatch;
 	std::unique_ptr<Font> Font;
@@ -146,6 +149,7 @@ void LevelRenderer::LoadContent(GraphicsContext& graphicsContext)
 	_pImpl->SpriteBatch.reset(new SpriteBatch(graphicsContext));
 	_pImpl->BlankPixel = TextureHelper::CreateBlankTexture(graphicsContext);
 	_pImpl->FadeTexture = Content::LoadTexture("Textures/FadeTextures.png");
+	_pImpl->VignetteTexture = Content::LoadTexture("Textures/Vignette.png");
 	_pImpl->Font = Content::LoadFont(graphicsContext, "Fonts/Wonder.ttf", 32);
 	_pImpl->FontSmall = Content::LoadFont(graphicsContext, "Fonts/Wonder.ttf", 24);
 }
@@ -164,10 +168,8 @@ void LevelRenderer::Render()
 	_pImpl->DrawPreviewBlock(Vector2f(Screen::GetWidth() - 26 * 2 - 26 * 4.5f, 48), _pImpl->Level.GetBoard().GetHoldedBlock(), "Hold");
 	_pImpl->SpriteBatch->DrawText(*_pImpl->FontSmall, "Score", Vector2f(100, 214), GetBlockColor(BlockType::Empty), TextCorner::Center);
 	_pImpl->SpriteBatch->DrawText(*_pImpl->FontSmall, std::to_string(_pImpl->Level.GetCurrentScore()), Vector2f(100, 240), GetBlockColor(BlockType::Empty), TextCorner::Center);
-	
+	_pImpl->SpriteBatch->Draw(*_pImpl->VignetteTexture, _pImpl->GetBoardArea(), Color::White * 0.25f);
 
-	auto texture = Content::LoadTexture("Textures/Vignette.png");
-	_pImpl->SpriteBatch->Draw(*texture, _pImpl->GetBoardArea(), Color::White);
 	_pImpl->SpriteBatch->End();
 
 }

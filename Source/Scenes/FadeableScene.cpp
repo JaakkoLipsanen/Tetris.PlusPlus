@@ -22,7 +22,6 @@ struct FadeableScene::Impl
 	FadeableScene::Impl(float fadeTime, Color fadeColor) :
 		 FadeState(FadeState::FadingIn), FadeAlpha(static_cast<int>(1)), FadeTime(fadeTime), FadeColor(fadeColor)
 	{
-		
 	}
 
 	std::unique_ptr<Scene> SceneToLoad;
