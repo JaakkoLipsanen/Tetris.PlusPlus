@@ -5,8 +5,11 @@
 #include <Graphics/SpriteBatch.h>
 #include <Graphics/TextureHelper.h>
 #include <Graphics/Font.h>
+#include <Graphics/BlendState.h>
 #include <Content/Content.h>
 #include <Engine/Screen.h>
+
+#include <Math/RectangleF.h>
 
 struct LevelRenderer::Impl
 {
@@ -15,11 +18,17 @@ struct LevelRenderer::Impl
 	{
 	}
 
+	RectangleF GetBoardArea()
+	{
+		auto& board = this->Level.GetBoard();
+		Vector2f topLeft = (static_cast<Vector2f>(Screen::GetSize().ToVector2i()) - Vector2f(board.Width, board.VisibleHeight) * BlockSize) / 2.0f;
+		return RectangleF(topLeft.X, topLeft.Y, board.Width * BlockSize, board.VisibleHeight * BlockSize);
+	}
+
 	void DrawBoard()
 	{
 		auto& board = this->Level.GetBoard();
-
-		Vector2f startLocation = (static_cast<Vector2f>(Screen::GetSize().ToVector2i()) - Vector2f(board.Width, board.VisibleHeight) * BlockSize) / 2.0f;
+		Vector2f startLocation = this->GetBoardArea().TopLeft();
 		for (int y = 0; y < board.VisibleHeight; y++)
 		{
 			for (int x = 0; x < board.Width; x++)
@@ -27,6 +36,42 @@ struct LevelRenderer::Impl
 				this->DrawSingleBlock(startLocation + Vector2f(x, y) * BlockSize, board.AtVisually(x, y));
 			}
 		}
+
+		// draw "fades"
+		for (int y = 0; y < board.VisibleHeight; y++)
+		{
+			for (int x = 0; x < board.Width; x++)
+			{
+				if (board.AtVisually(x, y) == BlockType::Empty)
+				{
+
+					for (int yOffset = -1; yOffset <= 1; yOffset++)
+					{
+						for (int xOffset = -1; xOffset <= 1; xOffset++)
+						{
+							if (yOffset == 0 && xOffset == 0)
+							{
+								continue;
+							}
+
+							if (board.AtVisually(x + xOffset, y + yOffset) != BlockType::Empty)
+							{
+								this->DrawFade(startLocation + Vector2f(x, y - 1) * BlockSize, -xOffset, -yOffset);	
+							}
+						}
+					}
+
+				}
+			}
+		}
+	}
+
+	void DrawFade(Vector2f position, int xDir, int yDir)
+	{
+		static const int FadeBlockSize = 64;
+		Rectangle sourceRectangle(FadeBlockSize + xDir * FadeBlockSize, FadeBlockSize + yDir * FadeBlockSize, FadeBlockSize, FadeBlockSize);
+
+		this->SpriteBatch->Draw(*this->FadeTexture, RectangleF(position.X, position.Y, BlockSize, BlockSize), Color(128, 128, 128) * 0.25f, sourceRectangle);
 	}
 
 
@@ -38,7 +83,7 @@ struct LevelRenderer::Impl
 
 		Block ghostBlock = board.GetGhostBlock();
 
-		Vector2f startLocation = (static_cast<Vector2f>(Screen::GetSize().ToVector2i()) - Vector2f(board.Width, board.VisibleHeight) * BlockSize) / 2.0f;
+		Vector2f startLocation = this->GetBoardArea().TopLeft();
 		Vector2f blockAdjustment = Vector2f(ghostBlock.GetBottomLeftPosition().X, Board::VisibleHeight - ghostBlock.GetBoundingArea().MaxY()) * BlockSize;
 		this->DrawBlock(startLocation + blockAdjustment, ghostBlock.GetData(), ghostBlock.Type, GhostBlockAlpha);
 	}
@@ -82,6 +127,7 @@ struct LevelRenderer::Impl
 
 	GraphicsContext* GraphicsContext;
 	std::unique_ptr<Texture2D> BlankPixel;
+	std::unique_ptr<Texture2D> FadeTexture;
 	std::unique_ptr<SpriteBatch> SpriteBatch;
 	std::unique_ptr<Font> Font;
 	std::unique_ptr<::Font> FontSmall;
@@ -99,6 +145,7 @@ void LevelRenderer::LoadContent(GraphicsContext& graphicsContext)
 	_pImpl->GraphicsContext = &graphicsContext;
 	_pImpl->SpriteBatch.reset(new SpriteBatch(graphicsContext));
 	_pImpl->BlankPixel = TextureHelper::CreateBlankTexture(graphicsContext);
+	_pImpl->FadeTexture = Content::LoadTexture("Textures/FadeTextures.png");
 	_pImpl->Font = Content::LoadFont(graphicsContext, "Fonts/Wonder.ttf", 32);
 	_pImpl->FontSmall = Content::LoadFont(graphicsContext, "Fonts/Wonder.ttf", 24);
 }
@@ -110,12 +157,17 @@ void LevelRenderer::Update()
 void LevelRenderer::Render()
 {
 	_pImpl->SpriteBatch->Begin();
+
 	_pImpl->DrawBoard();
 	_pImpl->DrawGhostBlock();
 	_pImpl->DrawPreviewBlock(Vector2f(26, 48), _pImpl->Level.GetBoard().GetNextBlock(), "Next");
 	_pImpl->DrawPreviewBlock(Vector2f(Screen::GetWidth() - 26 * 2 - 26 * 4.5f, 48), _pImpl->Level.GetBoard().GetHoldedBlock(), "Hold");
 	_pImpl->SpriteBatch->DrawText(*_pImpl->FontSmall, "Score", Vector2f(100, 214), GetBlockColor(BlockType::Empty), TextCorner::Center);
 	_pImpl->SpriteBatch->DrawText(*_pImpl->FontSmall, std::to_string(_pImpl->Level.GetCurrentScore()), Vector2f(100, 240), GetBlockColor(BlockType::Empty), TextCorner::Center);
+	
 
+	auto texture = Content::LoadTexture("Textures/Vignette.png");
+	_pImpl->SpriteBatch->Draw(*texture, _pImpl->GetBoardArea(), Color::White);
 	_pImpl->SpriteBatch->End();
+
 }

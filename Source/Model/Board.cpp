@@ -33,8 +33,10 @@ struct Board::Impl
 
 	BlockType AtInternal(int x, int y, bool allowFallingBlock)
 	{
-		Ensure::WithinRange(x, 0, Board::Width);
-		Ensure::WithinRange(y, 0, Board::Height);
+		if (x < 0 || x >= Board::Width || y < 0 || y >= Board::Height)
+		{
+			return BlockType::Empty;
+		}
 
 		auto blockType = this->Blocks[x + y * Board::Width];
 		if (blockType != BlockType::Empty)
@@ -184,8 +186,10 @@ BlockType Board::At(int x, int y) const
 // in this case, y starts from top (y == 0 is really Board::VisualHeight - 1)
 BlockType Board::AtVisually(int x, int y) const
 {
-	Ensure::WithinRange(x, 0, this->Width);
-	Ensure::WithinRange(y, 0, this->VisibleHeight);
+	if (x < 0 || x >= this->Width || y < 0 || y >= this->VisibleHeight)
+	{
+		return BlockType::Empty;
+	}
 
 	return _pImpl->AtInternal(x, this->VisibleHeight - 1 - y, true);
 }
