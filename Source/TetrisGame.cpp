@@ -10,13 +10,14 @@
 #include <Graphics/Post Processing/PostProcessRenderer.h>
 #include <Graphics/Post Processing/Vignette.h>
 #include <Graphics/Post Processing/ColorAdjust.h>
+#include "Scenes/GameScene.h"
 
 class TetrisGame : public Game
 {
 protected:
 	std::unique_ptr<Scene> CreateDefaultScene() override
 	{
-		return std::unique_ptr<Scene>(new MainMenuScene());
+		return std::unique_ptr<Scene>(new GameScene());
 	}
 
 	void SetupWindow(WindowDescription& description) override

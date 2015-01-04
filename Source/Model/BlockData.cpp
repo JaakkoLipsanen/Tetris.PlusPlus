@@ -7,8 +7,13 @@
 
 bool BlockData::At(int x, int y) const
 {
-	Ensure::WithinRange(x, 0, this->Width);
-	Ensure::WithinRange(y, 0, this->Height);
+	if (x < 0 || x >= this->Width || y < 0 || y >= this->Height)
+	{
+		return false;
+	}
+
+//	Ensure::WithinRange(x, 0, this->Width);
+//	Ensure::WithinRange(y, 0, this->Height);
 
 	return _data[x + y * this->Width];
 }
