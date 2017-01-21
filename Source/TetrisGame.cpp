@@ -22,7 +22,7 @@ protected:
 	void SetupWindow(WindowDescription& description) override
 	{
 		description.Resolution = Size(720, 720);
-		description.HasBorders = false;
+		description.HasBorders = true;
 	}
 
 	void Initialize() override

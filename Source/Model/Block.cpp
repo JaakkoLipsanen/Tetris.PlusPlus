@@ -13,12 +13,12 @@ static Vector2i GetSpawnLocation(BlockType type)
 		throw std::invalid_argument("'Empty' cannot be spawned");
 
 	case BlockType::I:
-		return Vector2i(Board::Width / 2 - 2, Board::VisibleHeight); // centered horizontally (4x4)
+		return Vector2i(Board::Width / 2 - 2, Board::VisibleHeight - 1); // centered horizontally (4x4)
 	case BlockType::O:
-		return Vector2i(Board::Width / 2 - 1, Board::VisibleHeight + 1); // centered horizontally (2x2)
+		return Vector2i(Board::Width / 2 - 1, Board::VisibleHeight + 1 - 1); // centered horizontally (2x2)
 
 	default:
-		return Vector2i(Board::Width / 2 - 2, Board::VisibleHeight + 1); // all the other blocks (3x3). Spawns so that horizontally 2 blocks are before the mid-point and 1 block after
+		return Vector2i(Board::Width / 2 - 2, Board::VisibleHeight + 1 - 1); // all the other blocks (3x3). Spawns so that horizontally 2 blocks are before the mid-point and 1 block after
 	}
 }
 
